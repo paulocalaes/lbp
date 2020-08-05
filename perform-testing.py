@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 # For array manipulations
 import numpy as np
 # For saving histogram values
-from sklearn.externals import joblib
+import joblib
 # For command line input
 import argparse as ap
 # Utility Package
@@ -34,7 +34,7 @@ X_name, X_test, y_test = joblib.load("lbp.pkl")
 test_images = cvutils.imlist(args["testingSet"])
 # Dictionary containing image paths as keys and corresponding label as value
 test_dic = {}
-with open(args["imageLabels"], 'rb') as csvfile:
+with open(args["imageLabels"], 'rt') as csvfile:
     reader = csv.reader(csvfile, delimiter=' ')
     for row in reader:
         test_dic[row[0]] = int(row[1])
@@ -43,7 +43,7 @@ with open(args["imageLabels"], 'rb') as csvfile:
 results_all = {}
 
 for test_image in test_images:
-    print "\nCalculating Normalized LBP Histogram for {}".format(test_image)
+    print( "\nCalculating Normalized LBP Histogram for {}".format(test_image))
     # Read the image
     im = cv2.imread(test_image)
     # Convert to grayscale as LBP works on grayscale image
@@ -62,13 +62,13 @@ for test_image in test_images:
     # For each image in the training dataset
     # Calculate the chi-squared distance and the sort the values
     for index, x in enumerate(X_test):
-        score = cv2.compareHist(np.array(x, dtype=np.float32), np.array(hist, dtype=np.float32), cv2.cv.CV_COMP_CHISQR)
+        score = cv2.compareHist(np.array(x, dtype=np.float32), np.array(hist, dtype=np.float32), cv2.HISTCMP_CHISQR)
         results.append((X_name[index], round(score, 3)))
     results = sorted(results, key=lambda score: score[1])
     results_all[test_image] = results
-    print "Displaying scores for {} ** \n".format(test_image)
+    print("Displaying scores for {} ** \n".format(test_image))
     for image, score in results:
-        print "{} has score {}".format(image, score)
+        print("{} has score {}".format(image, score))
 
 for test_image, results in results_all.items():
     # Read the image
